@@ -76,6 +76,14 @@ with open('visitors.csv', 'r') as csvfile:
             if click['visitId'] == visitId and click['pageName'] in conversions:
                 conversions[click['pageName']] = True
 
+        # conversionsCount = 0
+        # for conversion in conversions:
+        #     if conversions[conversion]:
+        #         conversionsCount += 1
+        #
+        # if conversionsCount < 1:
+        #     continue
+
         visits.append({
             "visitId": visitId,
             "referrerType": referrers[row[1]]['referrerType'] if row[1] in referrers else None,
@@ -161,13 +169,17 @@ def printRules(rules):
 
 df = pd.read_csv("export.csv")
 del df["visitId"]
+del df['lengthPagecount']
+del df['lengthSeconds']
+del df['hour']
+
 
 dataset = []
 for index, row in df.iterrows():
     row = [col + "=" + str(row[col]) for col in list(df)]
     dataset.append(row)
-frequentItemsets, supports = apriori(dataset, 0.3)
-rules = genereateRules(frequentItemsets, supports, 0.5)
+frequentItemsets, supports = apriori(dataset, 0.1)
+rules = genereateRules(frequentItemsets, supports, 0.3)
 
 rules = sorted(rules, key=lambda k: k['confidence'], reverse=True)
 
